@@ -49,16 +49,22 @@ jobs:
       - name: Sync version
         run: scripts/generate-version.sh
 
-      - name: Build
-        run: swift build -c release --product remindctl
+      - name: Build universal binary
+        run: |
+          swift build -c release --product remindctl --arch arm64
+          swift build -c release --product remindctl --arch x86_64
+          mkdir -p dist
+          lipo -create \
+            .build/arm64-apple-macosx/release/remindctl \
+            .build/x86_64-apple-macosx/release/remindctl \
+            -output dist/remindctl
+          lipo -info dist/remindctl
 
       - name: Codesign
-        run: codesign --force --sign - --identifier com.steipete.remindctl .build/release/remindctl
+        run: codesign --force --sign - --identifier com.steipete.remindctl dist/remindctl
 
       - name: Package artifact
         run: |
-          mkdir -p dist
-          cp .build/release/remindctl dist/remindctl
           (
             cd dist
             zip -r remindctl-macos.zip remindctl

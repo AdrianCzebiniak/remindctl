@@ -33,8 +33,12 @@ check:
 build:
 	scripts/generate-version.sh
 	mkdir -p bin
-	swift build -c release --product remindctl
-	cp .build/release/remindctl bin/remindctl
+	swift build -c release --product remindctl --arch arm64
+	swift build -c release --product remindctl --arch x86_64
+	lipo -create \
+		.build/arm64-apple-macosx/release/remindctl \
+		.build/x86_64-apple-macosx/release/remindctl \
+		-output bin/remindctl
 	codesign --force --sign - --identifier com.steipete.remindctl bin/remindctl
 
 release-check:

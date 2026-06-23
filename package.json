@@ -14,6 +14,6 @@
     "check": "pnpm -s lint && pnpm -s test && pnpm -s coverage",
     "docs:site": "node scripts/build-docs-site.mjs",
     "clean": "swift package clean",
-    "build": "pnpm -s version:sync && mkdir -p bin && swift build -c release --product remindctl && cp .build/release/remindctl bin/remindctl && codesign --force --sign - --identifier com.steipete.remindctl bin/remindctl"
+    "build": "pnpm -s version:sync && mkdir -p bin && swift build -c release --product remindctl --arch arm64 && swift build -c release --product remindctl --arch x86_64 && lipo -create .build/arm64-apple-macosx/release/remindctl .build/x86_64-apple-macosx/release/remindctl -output bin/remindctl && codesign --force --sign - --identifier com.steipete.remindctl bin/remindctl"
   }
 }
